@@ -1,0 +1,17 @@
+{
+  "name": "tcc",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.18.1",
+    "johnny-five": "^2.1.0",
+    "socket.io": "^4.5.1",
+    "yarn": "^1.22.18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "main": "server.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

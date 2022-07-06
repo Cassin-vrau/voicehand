@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCC</title>
+    <style>
+        .container{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            background-color: midnightblue;
+        }
+        .center{
+           width: 100px;
+           height: 100px;
+           display: flex;
+           justify-content: center;
+           flex-wrap: wrap;
+        }
+        button{
+            aspect-ratio: 1;
+            display: grid;
+            place-items: center;
+            width: 100px;
+            height: 100px;
+            background-color: aliceblue;
+            border: none;
+            border: 2px solid black;
+            border-radius: 50%;
+    }
+    .img{
+    height: 50px;
+    width: 50px;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <div class="center">
+    <h1>BIOTRON</h1>
+    <button onclick="runsr()">
+        <img class="img"src="https://img.icons8.com/ios/50/000000/microphone.png"/>
+      </button>
+    <span class="action"></span>
+    <div class="output"></div>
+</div>
+</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    const socket = io();
+    const button = window.document.querySelector('button')
+    const span = window.document.querySelector('.action');
+    const output = window.document.querySelector('.output');
+    function runsr(){
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    
+    
+    let statuss;
+
+    recognition.onstart = function (){
+        button.style.borderColor = "red"
+        button
+        statuss = "falando"
+        socket.emit('status', statuss);
+        socket.on('status', function(status){
+            span.innerHTML=`${status}`
+        })
+    }
+
+    recognition.onspeechend = function (){
+        button.style.borderColor = "black"
+        statuss = "parou"
+        socket.emit('status', statuss);
+        socket.on('status', function(status){
+            span.innerHTML=`${status}`
+        })
+        recognition.stop();
+    }
+
+    recognition.onresult = function(e){
+        var transcript = e.results[0][0].transcript.toLowerCase();
+        var confidence = e.results[0][0].confidence;
+        socket.emit('message', transcript);
+        socket.on('message', function(msg){
+            output.innerHTML=`Text: ${msg}`
+        })
+        if(transcript === 'abrir'){
+            button.style.backgroundColor = 'green';
+        }
+        else if(transcript === 'fechar'){
+            button.style.backgroundColor = 'red';
+        }else{
+            button.style.backgroundColor = 'white';
+        }
+    }
+
+    recognition.start();
+
+}
+    </script>
+</body>
+</html>
